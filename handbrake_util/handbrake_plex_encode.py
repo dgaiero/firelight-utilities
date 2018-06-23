@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import datetime
 import time
 from configparser import ConfigParser
 from io import StringIO
@@ -13,7 +14,6 @@ from sendgrid.helpers.mail import Content, Email, Mail
 class VideoProcessor:
 
     def __init__(self, config_location):
-        print("Initalizing Video Processor")
         # Setup settings configuration for settings.ini file
         settings_config = ConfigParser()
         settings_config.read(config_location)
@@ -24,6 +24,7 @@ class VideoProcessor:
         self.from_email = settings_config.get('mail_settings', 'from_email')
         self.to_email = settings_config.get('mail_settings', 'to_email')
         # Directory Settings
+        self.current_directory = os.path.join(os.path.dirname(os.getcwd()), "handbrake_util")
         # Movie Directory Settings
         self.process_movies = settings_config.get(
             'directory_settings', 'process_movies')
@@ -54,13 +55,13 @@ class VideoProcessor:
             in_file = folder[0]
             out_file = os.path.join(
                 self.movie_output_directory, folder[1] + ".mkv")
+            preset_file = os.path.join(self.current_directory, self.preset_settings_location)
             move_file = os.path.join(self.movie_processed_directory, folder[1])
             # Subprocess call for handbrake encode
-            # Output JSON format (for later use...)
             # Select main feature track
             # Import pre-selected preset file
-            subproc_handbrake_call = 'HandBrakeCLI --json -i "{}" --main-feature -o "{}" --preset-import-file "{}"'.format(
-                in_file, out_file, self.preset_settings_location)
+            subproc_handbrake_call = 'HandBrakeCLI -i "{}" --main-feature -o "{}" --preset-import-file "{}"'.format(
+                in_file, out_file, preset_file)
             handbrake_err = command_proc(subproc_handbrake_call)
             if handbrake_err == 0:
                 subproc_mv_call = 'mv "{}" "{}"'.format(in_file, move_file)
@@ -74,7 +75,7 @@ class VideoProcessor:
         from_email = Email(self.from_email)
         to_email = Email(self.to_email)
         subject = "PLEX Processing Result"
-        content = Content("text/plain", body)
+        content = Content("text/html", body)
         mail = Mail(from_email, subject, to_email, content)
         sg.client.mail.send.post(request_body=mail.get())
 
@@ -100,11 +101,19 @@ def walklevel(some_dir, level=1):
             del dirs[:]
 
 
+def logger():
+    pass
+
+
 def command_proc(runstr):
     print("\n##########################################")
     print("Processing Command: {}\n".format(runstr))
+    start_time = time.time()
     subproc_call = subprocess.Popen(
         runstr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    end_time = time.time()
+    time_delta = end_time - start_time
+    human_time_delta = datetime.timedelta(seconds=time_delta).__str__()
     out, err = subproc_call.communicate()
     errcode = subproc_call.returncode
 
@@ -116,8 +125,9 @@ def command_proc(runstr):
         print(err.decode('utf-8'))
         print("-------------------ERCODE-------------------")
         print(str(errcode))
+        print("Processed Command in {}".format(human_time_delta))
     else:
-        print("Processed Command successfully")
+        print("Processed Command successfully in {}".format(human_time_delta))
     print("##########################################")
     return errcode
 

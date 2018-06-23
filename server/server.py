@@ -3,7 +3,7 @@ import sys
 from io import StringIO
 
 from celery import Celery
-from flask import Flask, render_template
+from flask import Flask, render_template, request, Response, stream_with_context
 
 sys.path.append(os.path.dirname(os.getcwd()))
 import handbrake_util.handbrake_plex_encode
@@ -17,7 +17,12 @@ celery = Celery(app.name, broker='amqp://localhost')
 
 @app.route('/')
 def index():
-    return("Please navigate to the script URL provided to you.")
+    links = ''
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != "static":
+            links += "<a href='{0}{1}'>{0}{1}</a><br>".format(request.base_url,rule)
+    return("The following are valid rules. Either click the one below or navigate to the URL directly.<br>" + links)
+    # return("Please navigate to the script URL provided to you.")
 
 
 @app.route('/handbrake-util')
@@ -45,12 +50,14 @@ def handbrake_proc_runner():
         if vProc.send_mail:
             old_stdout = sys.stdout
             sys.stdout = proc_stdout = StringIO()
+        print("<pre>")
         print("Processing {} movies".format(len(vProc.movie_file_dir_list)))
         print("-------------------")
         for directory in vProc.movie_file_dir_list:
             print("In Queue: {}".format(directory[1]))
         vProc.proc_movies()
         if vProc.send_mail:
+            print("</pre>")
             sys.stdout = old_stdout
             email = proc_stdout.getvalue()
             print(email)
@@ -62,5 +69,5 @@ def handbrake_proc_runner():
 
 
 if __name__ == "__main__":
-    ''' For debug purposes only. '''
+    ''' For debug purposes only. Set host to 0.0.0.0 to allow access on all NICs.'''
     app.run(host='0.0.0.0', debug=True)
