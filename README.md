@@ -49,21 +49,21 @@ Follow the below steps to configure a new IIS site.
     1. Right click on the setting that was created from the `wfastcgi-enable` command. Select `Edit`
     2. Click on `Environmental Variables`.
     3. Make sure there are two enviromental variables:
-          Name|Value
+        * Name|Value
            ---|---
            **PYTHONPATH**|Location to server directory (the one with `server.py`)
            **WSGI_HANDLER**|`app.app`
 2. Make a new site, none of the settings matter.
     1. Click on `Handler Mappings` in the new site settings.
         1. Click `Add Module Mapping`.
-              Settings|Value
+            * Settings|Value
                 ---|---
                 Request Path|\*
                 Module|FastCgiModule
                 Executable|(Location to Python in venv)\|(Location to wsgi in venv)<br>Example: `C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Scripts\python.exe\|C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Lib\site-packages\wfastcgi.py`
                 Name|Doesn't matter
     2. Click on `Application Settings` in the new site settings.
-          Settings|Value
+        * Settings|Value
            ---|---
            **PYTHONPATH**|Location to server directory (the one with `server.py`)
            **WSGI_HANDLER**|`app.app`
