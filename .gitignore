@@ -87,6 +87,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+server/script_server/
+
+server/logs/
 
 # Spyder project settings
 .spyderproject
@@ -109,6 +112,9 @@ plex-preset.json
 
 # Test Files
 _stdoutstderrREDIR.log
+
+# Extrenaous executables
+HandBrakeCLI.exe
 
 
 # End of https://www.gitignore.io/api/python

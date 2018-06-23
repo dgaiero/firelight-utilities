@@ -5,16 +5,18 @@ import time
 from configparser import ConfigParser
 from io import StringIO
 
+import click
 import sendgrid
 from sendgrid.helpers.mail import Content, Email, Mail
 
 
 class VideoProcessor:
 
-    def __init__(self):
+    def __init__(self, config_location):
+        print("Initalizing Video Processor")
         # Setup settings configuration for settings.ini file
         settings_config = ConfigParser()
-        settings_config.read('settings.ini')
+        settings_config.read(config_location)
         # Mail Settings
         self.send_mail = settings_config.get('mail_settings', 'send_mail')
         self.sendgrid_API = settings_config.get(
@@ -43,8 +45,8 @@ class VideoProcessor:
         # Other Settings
         self.preset_settings_location = settings_config.get(
             'settings', 'preset_setting')
-
         self.movie_file_dir_list = find_dirs(self.movie_input_directory)
+        # self.movie_file_dir_list = [("1", "1")]
 
     def proc_movies(self):
         ''' Processes Movies in given input directory and moves them to processed directory '''
@@ -59,14 +61,16 @@ class VideoProcessor:
             # Import pre-selected preset file
             subproc_handbrake_call = 'HandBrakeCLI --json -i "{}" --main-feature -o "{}" --preset-import-file "{}"'.format(
                 in_file, out_file, self.preset_settings_location)
-            command_proc(subproc_handbrake_call)
-            subproc_mv_call = 'mv "{}" "{}"'.format(in_file, move_file)
-            command_proc(subproc_mv_call)
+            handbrake_err = command_proc(subproc_handbrake_call)
+            if handbrake_err == 0:
+                subproc_mv_call = 'mv "{}" "{}"'.format(in_file, move_file)
+                command_proc(subproc_mv_call)
+            else:
+                print("Skipping move due to prior errors.")
 
 
     def send_email(self, body):
         sg = sendgrid.SendGridAPIClient(apikey=self.sendgrid_API)
-
         from_email = Email(self.from_email)
         to_email = Email(self.to_email)
         subject = "PLEX Processing Result"
@@ -97,6 +101,7 @@ def walklevel(some_dir, level=1):
 
 
 def command_proc(runstr):
+    print("\n##########################################")
     print("Processing Command: {}\n".format(runstr))
     subproc_call = subprocess.Popen(
         runstr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -104,26 +109,38 @@ def command_proc(runstr):
     errcode = subproc_call.returncode
 
     if errcode is not 0:
-        print("ERROR\nOUTPUT SHOWN BELOW\n\n")
-        print("-------------------OUTPUT-------------------" + "\n")
-        print(out.decode('utf-8') + "\n")
-        print("-------------------ERRORS-------------------" + "\n")
-        print(err.decode('utf-8') + "\n")
-        print("-------------------ERCODE-------------------" + "\n")
-        print(str(errcode) + "\n")
+        print("ERROR\nOUTPUT SHOWN BELOW")
+        print("-------------------OUTPUT-------------------")
+        print(out.decode('utf-8'))
+        print("-------------------ERRORS-------------------")
+        print(err.decode('utf-8'))
+        print("-------------------ERCODE-------------------")
+        print(str(errcode))
     else:
-        print("Processed Command:  " + runstr + " successfully" + "\n")
+        print("Processed Command successfully")
+    print("##########################################")
+    return errcode
 
-
-def main():
-    old_stdout = sys.stdout
-    sys.stdout = proc_stdout = StringIO()
-    vProc = VideoProcessor()
-    vProc.proc_movies()
-    sys.stdout = old_stdout
-    email = proc_stdout.getvalue()
-    print(email)
-    vProc.send_email(email)
+@click.command()
+@click.option('--setting', default='settings.ini', help='Settings.ini file location')
+def main(setting=''):
+    vProc = VideoProcessor(setting)
+    if vProc.send_mail:
+        old_stdout = sys.stdout
+        sys.stdout = proc_stdout = StringIO()
+    print("Processing {} movies".format(len(vProc.movie_file_dir_list)))
+    print("-------------------")
+    for directory in vProc.movie_file_dir_list:
+        print("In Queue: {}".format(directory[1]))
+    if len(vProc.movie_file_dir_list) != 0:
+        vProc.proc_movies()
+    else:
+        print("No Files Processed.")
+    if vProc.send_mail:
+        sys.stdout = old_stdout
+        email = proc_stdout.getvalue()
+        print(email)
+        vProc.send_email(email)
 
 
 if __name__ == "__main__":
