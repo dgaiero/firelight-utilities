@@ -57,17 +57,17 @@ Follow the below steps to configure a new IIS site.
     1. Click on `Handler Mappings` in the new site settings.
         1. Click `Add Module Mapping`.
             1. Settings|Value
-            ---|---
-            Request Path|*
-            Module|FastCgiModule
-            Executable|(Location to Python in venv)\|(Location to wsgi in venv)<br>Example: `C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Scripts\python.exe|C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Lib\site-packages\wfastcgi.py`
-            Name|Doesn't matter
+                ---|---
+                Request Path|\*
+                Module|FastCgiModule
+                Executable|(Location to Python in venv)\|(Location to wsgi in venv)<br>Example: `C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Scripts\python.exe|C:\Admin_Utilities\adminScripts\firelight-utilities\server\script_server\Lib\site-packages\wfastcgi.py`
+                Name|Doesn't matter
     2. Click on `Application Settings` in the new site settings.
         1. Settings|Value
            ---|---
            **PYTHONPATH**|Location to server directory (the one with `server.py`)
            **WSGI_HANDLER**|`app.app`
-           **WSGI_RESTART_FILE_REGEX**|`.*((\.py)|(\.config))$`
+           **WSGI_RESTART_FILE_REGEX**|`.*((\.py)\|(\.config))$`
 3. Make sure whatever account is being used to authenticate the website has `RWX` access to all directories necessary (server directory, all directories specified in handbrake_util `settings.ini`, etc.). Also, make sure the `DOMAIN\IIS_ISURS` and `.\ISUR` has the same access.
 
 A Sample `web.config` file is shown below:
