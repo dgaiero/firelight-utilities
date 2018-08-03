@@ -52,6 +52,7 @@ class VideoProcessor:
     def proc_movies(self):
         ''' Processes Movies in given input directory and moves them to processed directory '''
         for folder in self.movie_file_dir_list:
+            print("\n##########################################")
             in_file = folder[0]
             out_file = os.path.join(
                 self.movie_output_directory, folder[1] + ".mkv")
@@ -64,6 +65,9 @@ class VideoProcessor:
                 in_file, out_file, preset_file)
             handbrake_err = command_proc(subproc_handbrake_call)
             if handbrake_err == 0:
+                subproc_du_call = 'du -h "{}"'.format(out_file)
+                print("Checking File Size")
+                command_proc(subproc_du_call, True)
                 subproc_mv_call = 'mv "{}" "{}"'.format(in_file, move_file)
                 command_proc(subproc_mv_call)
             else:
@@ -105,18 +109,19 @@ def logger():
     pass
 
 
-def command_proc(runstr):
-    print("\n##########################################")
+def command_proc(runstr, show_output = False):
+    
     print("Processing Command: {}\n".format(runstr))
     start_time = time.time()
     subproc_call = subprocess.Popen(
         runstr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = subproc_call.communicate()
+    errcode = subproc_call.returncode
     end_time = time.time()
     time_delta = end_time - start_time
     human_time_delta = datetime.timedelta(seconds=time_delta).__str__()
-    out, err = subproc_call.communicate()
-    errcode = subproc_call.returncode
-
+    if show_output is True:
+        print("OUTPUT: {}".format(out.decode('utf-8')))
     if errcode is not 0:
         print("ERROR\nOUTPUT SHOWN BELOW")
         print("-------------------OUTPUT-------------------")
@@ -125,10 +130,9 @@ def command_proc(runstr):
         print(err.decode('utf-8'))
         print("-------------------ERCODE-------------------")
         print(str(errcode))
-        print("Processed Command in {}".format(human_time_delta))
     else:
-        print("Processed Command successfully in {}".format(human_time_delta))
-    print("##########################################")
+        print("Processed Command successfully.")
+    print("Total Time: {}".format(human_time_delta))
     return errcode
 
 @click.command()
@@ -138,6 +142,7 @@ def main(setting=''):
     if vProc.send_mail:
         old_stdout = sys.stdout
         sys.stdout = proc_stdout = StringIO()
+        print("<pre>")
     print("Processing {} movies".format(len(vProc.movie_file_dir_list)))
     print("-------------------")
     for directory in vProc.movie_file_dir_list:
@@ -147,6 +152,7 @@ def main(setting=''):
     else:
         print("No Files Processed.")
     if vProc.send_mail:
+        print("</pre>")
         sys.stdout = old_stdout
         email = proc_stdout.getvalue()
         print(email)

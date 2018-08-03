@@ -21,21 +21,22 @@ def index():
     for rule in app.url_map.iter_rules():
         if rule.endpoint != "static":
             links += "<a href='{0}{1}'>{0}{1}</a><br>".format(request.base_url,rule)
-    return("The following are valid rules. Either click the one below or navigate to the URL directly.<br>" + links)
+    return("<pre>The following are valid rules. Either click the one below or navigate to the URL directly.</pre><br>" + links)
     # return("Please navigate to the script URL provided to you.")
 
 
 @app.route('/handbrake-util')
 def handbrake_process():
     ''' Checks if lockfile exists, and if it does, exits. Otherwise, the handbrake processing script will be called to handle final procesing of video '''
+    # return("<b><pre>Due to excessive server load, this script cannot be run at this time. Please try again later.</pre></b>")
     handbrake_proc_dir = os.path.join(os.path.dirname(
         os.getcwd()), "handbrake_util")
     if os.path.isfile(os.path.join(handbrake_proc_dir, ".lockfile")):
-        return("The Video Processing Script has been assigned to a runner.\nOn completion, the script will finish and an email will be sent to the recipients in the configuration file.")
+        return("<pre>The Video Processing Script has been assigned to a runner.\nOn completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
     else:
         open(os.path.join(handbrake_proc_dir, ".lockfile"), "w")
         handbrake_proc_runner.apply_async()
-        return ("You may now close this window. On completion, the script will finish and an email will be sent to the recipients in the configuration file.")
+        return ("<pre>You may now close this window. On completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
 
 
 @celery.task
