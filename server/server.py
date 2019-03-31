@@ -45,7 +45,7 @@ def handbrake_process():
     vProc = handbrake_util.handbrake_plex_encode.VideoProcessor(
         os.path.join(handbrake_proc_dir, "settings.ini"))
     returnString = "<pre>"
-    returnString += vProc.movie_file_dir_list
+    returnString += str(vProc.movie_file_dir_list)
     for directory in vProc.movie_file_dir_list:
             returnString += "{}\n".format(directory[1])
     returnString += "</pre>"
