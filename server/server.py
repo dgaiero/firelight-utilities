@@ -45,10 +45,12 @@ def handbrake_process():
     vProc = handbrake_util.handbrake_plex_encode.VideoProcessor(
         os.path.join(handbrake_proc_dir, "settings.ini"))
     returnString = "<pre>"
+    print(vProc.movie_file_dir_list)
     for directory in vProc.movie_file_dir_list:
-            returnString += "In Queue: {}\n".format(directory[1])
+            returnString += "{}\n".format(directory[1])
     returnString += "</pre>"
-    returnString += "<a href='{0}'>{0}</a><br>".format(request.base_url)
+    returnString += "<a href='{0}?process=True'>{0}?process=True</a><br>".format(
+        request.base_url)
     return returnString
 
 
