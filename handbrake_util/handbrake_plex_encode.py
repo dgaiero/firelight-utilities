@@ -135,6 +135,9 @@ def command_proc(runstr, show_output = False):
     print("Total Time: {}".format(human_time_delta))
     return errcode
 
+def list_dir():
+    raise NotImplementedError
+
 @click.command()
 @click.option('--setting', default='settings.ini', help='Settings.ini file location')
 def main(setting=''):

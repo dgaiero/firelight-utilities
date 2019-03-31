@@ -3,12 +3,12 @@
 In this guide:
 
 * [Installing and configuring the Server](#installing-and-configuring-the-server)
-    * [Use](#use)
-    * [Notes](#notes)
-    * [Downloading and configuring the server from GitHub](#downloading-and-configuring-the-server-from-github)
-    * [Installing server dependecies](#installing-server-dependecies)
-    * [Configuring IIS to server wsgi application](#configuring-iis-to-server-wsgi-application)
-    * [Final Configuration Steps](#final-configuration-steps)
+  * [Use](#use)
+  * [Notes](#notes)
+  * [Downloading and configuring the server from GitHub](#downloading-and-configuring-the-server-from-github)
+  * [Installing server dependecies](#installing-server-dependecies)
+  * [Configuring IIS to server wsgi application](#configuring-iis-to-server-wsgi-application)
+  * [Final Configuration Steps](#final-configuration-steps)
 
 ## Use
 
@@ -25,8 +25,8 @@ This guide assumes the following:
 
 1. `git clone https://github.com/dgaiero/firelight-utilities.git`
 2. `cd server`
-3. `python -m venv`
-4. `venv/Scripts/activate` - All work should be done in the virtural environment.
+3. `python -m venv script_server`
+4. `script_server/Scripts/activate` - All work should be done in the virtural environment.
 5. pip install -r requirements.txt
 
 ## Installing server dependecies
