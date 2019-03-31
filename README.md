@@ -35,7 +35,7 @@ The script server uses celery to make asynchronous calls alowing commands to be 
 
 To install celery, run `pip install celery=3.1.24`. Please note, celery > v4 does not support windows. Once celery is installed, you must also install RabbitMq. Rabbit Mq handles message brokering. To install RabbitMq, visit https://www.rabbitmq.com/. RabbitMq has a dependicy of Erlang, available from: https://www.erlang.org/.
 
-## Configuring IIS to server wsgi application
+## Configuring IIS to serve wsgi application
 
 IIS must be configured to run a wsgi application.
 
