@@ -105,13 +105,9 @@ def walklevel(some_dir, level=1):
             del dirs[:]
 
 
-def logger():
-    pass
-
-
 def command_proc(runstr, show_output = False):
     
-    print("Processing Command: {}\n".format(runstr))
+    print("<b>Processing Command: {}\n</b>".format(runstr))
     start_time = time.time()
     subproc_call = subprocess.Popen(
         runstr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -124,19 +120,16 @@ def command_proc(runstr, show_output = False):
         print("OUTPUT: {}".format(out.decode('utf-8')))
     if errcode is not 0:
         print("ERROR\nOUTPUT SHOWN BELOW")
-        print("-------------------OUTPUT-------------------")
+        print("<b>-------------------OUTPUT-------------------</b>")
         print(out.decode('utf-8'))
-        print("-------------------ERRORS-------------------")
+        print("<b>-------------------ERRORS-------------------</b>")
         print(err.decode('utf-8'))
-        print("-------------------ERCODE-------------------")
+        print("<b>-------------------ERCODE-------------------</b>")
         print(str(errcode))
     else:
         print("Processed Command successfully.")
     print("Total Time: {}".format(human_time_delta))
     return errcode
-
-def list_dir():
-    raise NotImplementedError
 
 @click.command()
 @click.option('--setting', default='settings.ini', help='Settings.ini file location')
@@ -146,7 +139,7 @@ def main(setting=''):
         old_stdout = sys.stdout
         sys.stdout = proc_stdout = StringIO()
         print("<pre>")
-    print("Processing {} movies".format(len(vProc.movie_file_dir_list)))
+    print("<b>Processing <em>{}</em> movies<b>".format(len(vProc.movie_file_dir_list)))
     print("-------------------")
     for directory in vProc.movie_file_dir_list:
         print("In Queue: {}".format(directory[1]))

@@ -17,16 +17,13 @@ celery = Celery(app.name, broker='amqp://localhost')
 
 @app.route('/')
 def index():
-    links = ''
+    links = ""
     for rule in app.url_map.iter_rules():
         if rule.endpoint != "static":
-            links += "<a href='{0}{1}'>{0}{1}</a><br>".format(request.base_url,rule)
-    return("<pre>The following are valid rules. Either click the one below or navigate to the URL directly.</pre><br>" + links)
+            links += "<a href='{0}{1}'>{0}{1}</a>\n".format(request.base_url,rule)
+    links += "</pre>"
+    return("<pre>The following are valid rules. Either click the one below or navigate to the URL directly.\n\n" + links)
     # return("Please navigate to the script URL provided to you.")
-
-@app.route('/test')
-def test():
-    return "<h1>Hello World</h1>"
 
 @app.route('/handbrake-util')
 def handbrake_process():
@@ -35,7 +32,7 @@ def handbrake_process():
     handbrake_proc_dir = os.path.join(os.path.dirname(
         os.getcwd()), "handbrake_util")
     processStatus = request.args.get('process')
-    if processStatus == True:
+    if processStatus == "True":
         if os.path.isfile(os.path.join(handbrake_proc_dir, ".lockfile")):
             return("<pre>The Video Processing Script has been assigned to a runner.\nOn completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
         else:
@@ -44,15 +41,15 @@ def handbrake_process():
             return ("<pre>You may now close this window. On completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
     vProc = handbrake_util.handbrake_plex_encode.VideoProcessor(
         os.path.join(handbrake_proc_dir, "settings.ini"))
-    returnString = "<pre>"
-    returnString += str(vProc.movie_file_dir_list)
-    for directory in vProc.movie_file_dir_list:
-            returnString += "{}\n".format(directory[1])
-    returnString += "</pre>"
-    returnString += "<a href='{0}?process=True'>{0}?process=True</a><br>".format(
-        request.base_url)
-    return returnString
-
+    if vProc.movie_file_dir_list != []:
+        returnString = "<pre><b>Movies to be processed:</b>\n"
+        for directory in vProc.movie_file_dir_list:
+                returnString += "* {}\n".format(directory[1])
+        returnString += "\n<em>Click the following link to process the movies:</em>\n<b>Please Note:</b> If you wish to change your settings or movies to be processed, please modify the folder directly in the share.</pre>"
+        returnString += "<pre><a href='{0}?process=True'>{0}?process=True</a><br></pre>".format(
+            request.base_url)
+        return returnString
+    return "<pre><b>No movies in the MovieFolder.</b></pre>"
 
 @celery.task
 def handbrake_proc_runner():
