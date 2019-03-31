@@ -24,6 +24,9 @@ def index():
     return("<pre>The following are valid rules. Either click the one below or navigate to the URL directly.</pre><br>" + links)
     # return("Please navigate to the script URL provided to you.")
 
+@app.route('/test')
+def test():
+    return "<h1>Hello World</h1>"
 
 @app.route('/handbrake-util')
 def handbrake_process():
@@ -31,12 +34,22 @@ def handbrake_process():
     # return("<b><pre>Due to excessive server load, this script cannot be run at this time. Please try again later.</pre></b>")
     handbrake_proc_dir = os.path.join(os.path.dirname(
         os.getcwd()), "handbrake_util")
-    if os.path.isfile(os.path.join(handbrake_proc_dir, ".lockfile")):
-        return("<pre>The Video Processing Script has been assigned to a runner.\nOn completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
-    else:
-        open(os.path.join(handbrake_proc_dir, ".lockfile"), "w")
-        handbrake_proc_runner.apply_async()
-        return ("<pre>You may now close this window. On completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
+    processStatus = request.args.get('process')
+    if processStatus == True:
+        if os.path.isfile(os.path.join(handbrake_proc_dir, ".lockfile")):
+            return("<pre>The Video Processing Script has been assigned to a runner.\nOn completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
+        else:
+            open(os.path.join(handbrake_proc_dir, ".lockfile"), "w")
+            handbrake_proc_runner.apply_async()
+            return ("<pre>You may now close this window. On completion, the script will finish and an email will be sent to the recipients in the configuration file.</pre>")
+    vProc = handbrake_util.handbrake_plex_encode.VideoProcessor(
+        os.path.join(handbrake_proc_dir, "settings.ini"))
+    returnString = "<pre>"
+    for directory in vProc.movie_file_dir_list:
+            returnString += "In Queue: {}\n".format(directory[1])
+    returnString += "</pre>"
+    returnString += "<a href='{0}'>{0}</a><br>".format(request.base_url)
+    return returnString
 
 
 @celery.task
