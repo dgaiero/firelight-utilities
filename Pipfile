@@ -1,0 +1,40 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+
+[packages]
+amqp = "==1.4.9"
+anyjson = "==0.3.3"
+billiard = "==3.3.0.23"
+celery = "==3.1.24"
+certifi = "==2019.3.9"
+chardet = "==3.0.4"
+click = "==6.7"
+decorator = "==4.4.0"
+idna = "==2.6"
+imageio = "==2.5.0"
+imageio-ffmpeg = "==0.3.0"
+itsdangerous = "==1.1.0"
+kombu = "==3.0.37"
+moviepy = "==1.0.0"
+numpy = "==1.17.0"
+proglog = "==0.1.9"
+pytz = "==2018.9"
+requests = "==2.18.4"
+sendgrid = "==5.3.0"
+tqdm = "==4.34.0"
+urllib3 = "==1.22"
+wfastcgi = "==3.0.0"
+Flask = "==1.0.2"
+Jinja2 = "==2.10"
+MarkupSafe = "==1.1.1"
+Pillow = "==6.1.0"
+python_http_client = "==3.1.0"
+Werkzeug = "==0.15.1"
+
+[requires]
+python_version = "3.7"

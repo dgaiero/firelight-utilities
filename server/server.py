@@ -20,7 +20,7 @@ def index():
     links = ""
     for rule in app.url_map.iter_rules():
         if rule.endpoint != "static":
-            links += "<a href='{0}{1}'>{0}{1}</a>\n".format(request.base_url,rule)
+            links += "<a href='{0}{1}'>{0}{1}</a>\n".format(request.base_url, rule)
     links += "</pre>"
     return("<pre>The following are valid rules. Either click the one below or navigate to the URL directly.\n\n" + links)
     # return("Please navigate to the script URL provided to you.")
@@ -79,6 +79,10 @@ def handbrake_proc_runner():
     except Exception as e:
         os.remove(os.path.join(handbrake_proc_dir, ".lockfile"))
         raise Exception(e)
+
+@app.route('/movie-proc')
+def movie_processor():
+   return "test"
 
 
 if __name__ == "__main__":
