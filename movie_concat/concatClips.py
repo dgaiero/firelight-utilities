@@ -61,7 +61,7 @@ class VideoProcessor:
         fileDateList = []
         for item in fileList:
             fileDateList.append((item, os.path.getmtime(item)))
-        fileDateList.sort(key=lambda file: os.path.getctime(file[0]))
+        fileDateList.sort(key=lambda file: os.path.getmtime(file[0]))
         self.files = fileDateList
         return fileDateList
 
